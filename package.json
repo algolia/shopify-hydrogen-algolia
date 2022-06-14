@@ -1,6 +1,6 @@
 {
   "name": "hydrogen-algolia",
-  "description": "This the default template for Hydrogen",
+  "description": "Shopify hydrogen demo store using Algolia search & browse",
   "version": "0.0.0",
   "license": "MIT",
   "private": true,
@@ -30,13 +30,24 @@
     "vitest": "^0.12.9"
   },
   "dependencies": {
+    "@algolia/autocomplete-js": "^1.6.3",
+    "@algolia/autocomplete-plugin-algolia-insights": "^1.6.3",
+    "@algolia/autocomplete-plugin-query-suggestions": "^1.6.3",
+    "@algolia/autocomplete-plugin-recent-searches": "^1.6.3",
+    "@algolia/autocomplete-theme-classic": "^1.6.3",
     "@headlessui/react": "^1.5.0",
     "@shopify/hydrogen": "^0.24.0",
+    "algoliasearch": "^4.13.1",
     "body-parser": "^1.20.0",
     "compression": "^1.7.4",
+    "instantsearch.css": "^7.4.5",
+    "instantsearch.js": "^4.41.0",
+    "preact": "^10.7.3",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
+    "react-instantsearch-hooks": "^6.27.0",
+    "react-instantsearch-hooks-web": "^6.27.0",
     "serve-static": "^1.14.1"
   },
-  "author": "qinglin.ye"
+  "author": "qinglin.ye@algolia.com"
 }

@@ -1,0 +1,6 @@
+{
+  "appId": "YOUR_ALOGILIA_APP_ID",
+  "appKey": "YOUR_ALOGILIA_API_KEY",
+  "prefix": "YOUR_ALGOLIA_SHOPIFY_PREFIX",
+  "QSindex": "YOUR_QUERY_SUGGUESTION_INDEX"
+}
