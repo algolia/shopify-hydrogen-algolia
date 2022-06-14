@@ -60,10 +60,10 @@ export default function Footer({collection, product}) {
             </ul>
           </div>
           <div>
-            <h2 className="text-md font-medium uppercase mb-4">Templates</h2>
+            <h2 className="text-md font-medium uppercase mb-4">LINKS</h2>
             <ul className="mt-8 space-y-4">
               <li className="flex items-center text-sm font-medium text-gray-600 hover:text-gray-900">
-                <Link to="/home">Home</Link>
+                <Link to="/search">Search</Link>
               </li>
               <li className="flex items-center text-sm font-medium text-gray-600 hover:text-gray-900">
                 <Link to={`/products/${product?.handle}`}>Product</Link>
@@ -73,9 +73,6 @@ export default function Footer({collection, product}) {
                   Collection
                 </Link>
               </li>
-              <li className="flex items-center text-sm font-medium text-gray-600 hover:text-gray-900">
-                <Link to="/404">404</Link>
-              </li>
             </ul>
           </div>
           <div>
@@ -83,12 +80,12 @@ export default function Footer({collection, product}) {
             <ul className="mt-8 space-y-4">
               <li className="flex items-center text-sm font-medium text-gray-600 hover:text-gray-900">
                 <a href="https://shopify.dev/custom-storefronts/hydrogen">
-                  Hydrogen overview
+                  Hydrogen Overview
                 </a>
               </li>
               <li className="flex items-center text-sm font-medium text-gray-600 hover:text-gray-900">
-                <a href="https://shopify.dev/custom-storefronts/hydrogen/templates">
-                  Demo Store template
+                <a href="https://www.algolia.com/doc/integration/shopify/getting-started/quick-start/">
+                  Algolia Shopify QuickStart
                 </a>
               </li>
             </ul>

@@ -23,20 +23,6 @@ function ExternalIcon() {
   );
 }
 
-function DocsButton({url, label}) {
-  return (
-    <a
-      href={url}
-      target="_blank"
-      className="bg-white shadow py-2 px-5 rounded-full inline-flex items-center hover:opacity-80"
-      rel="noreferrer"
-    >
-      {label}
-      <ExternalIcon />
-    </a>
-  );
-}
-
 function BoxFallback() {
   return (
     <div className="bg-white p-12 shadow-xl rounded-xl text-gray-900 h-60"></div>
@@ -112,16 +98,22 @@ function TemplateLinks() {
 
   return (
     <div className="bg-white p-12 md:p-12 shadow-xl rounded-xl text-gray-900">
-      <p className="text-md font-medium uppercase mb-4">
-        Explore the templates
-      </p>
+      <p className="text-md font-medium uppercase mb-4">Explore Site Content</p>
       <ul>
+        <li className="mb-4">
+          <Link
+            to="/search"
+            className="text-md font-medium text-blue-700 hover:underline"
+          >
+            Search by Algolia
+          </Link>
+        </li>
         <li className="mb-4">
           <Link
             to={`/collections/${firstCollection}`}
             className="text-md font-medium text-blue-700 hover:underline"
           >
-            Collection template
+            Collection by Algolia
           </Link>
         </li>
         <li className="mb-4">
@@ -129,15 +121,7 @@ function TemplateLinks() {
             to={`/products/${firstProduct}`}
             className="text-md font-medium text-blue-700 hover:underline"
           >
-            Product template
-          </Link>
-        </li>
-        <li>
-          <Link
-            to="/error-page"
-            className="text-md font-medium text-blue-700 hover:underline"
-          >
-            404 template
+            Product
           </Link>
         </li>
       </ul>
@@ -152,23 +136,12 @@ export default function Welcome() {
   return (
     <div className="text-gray-900 pt-16 rounded-[40px] my-16 px-4 xl:px-12 bg-gradient-to-b from-white -mx-4 xl:-mx-12">
       <div className="text-center mb-16">
-        <h1 className="font-extrabold mb-4 text-5xl md:text-7xl">
-          Hello, Hydrogen
+        <h1 className="font-extrabold mb-10 text-5xl md:text-7xl">
+          Hydrogen X Algolia
         </h1>
-        <p className="text-lg mb-8">
-          Welcome to your custom storefront. Let&rsquo;s get building.
+        <p className="text-2xl mb-8">
+          Your new shopify search experience. Let&rsquo;s get building.
         </p>
-        <div className="flex flex-col lg:flex-row justify-center items-center gap-8 text-gray-700">
-          <DocsButton
-            url="https://shopify.dev/custom-storefronts/hydrogen"
-            label="Browse Hydrogen documentation"
-          />
-          <DocsButton url="/graphql" label="Open the GraphiQL explorer" />
-          <DocsButton
-            url="https://github.com/Shopify/hydrogen-examples"
-            label="Explore Hydrogen examples"
-          />
-        </div>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
         <Suspense fallback={<BoxFallback />}>
