@@ -16,10 +16,13 @@ Hydrogen is a React framework and SDK that you can use to build fast and dynamic
 
 ## Configuration for Hydrogen & Algolia
 - Algolia
+
 Update `algolia.config.json` with your Algolia APP ID & API KEY. 
-Update `algolia.config.json` with your shopify integration prefix ("shopify_" for example) and query sugguestion index name
+
+Update `algolia.config.json` with your shopify integration prefix ("shopify_" for example) and query sugguestion index name.
 
 - Hydrogen
+
 Update `hydrogen.config.js` with your shop's domain and Storefront API token.
 
 ## What's in this template
