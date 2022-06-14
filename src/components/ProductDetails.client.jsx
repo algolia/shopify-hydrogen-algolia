@@ -12,19 +12,43 @@ import {
   BUTTON_PRIMARY_CLASSES,
   BUTTON_SECONDARY_CLASSES,
 } from './Button.client';
+import algoConfig from '../../algolia.config.json';
 
-function AddToCartMarkup() {
+// Send conversion events to Algolia
+function sendConversion(queryID, objectID, sendEvent) {
+  if (sendEvent) {
+    window.aa('init', {
+      appId: algoConfig.appId,
+      apiKey: algoConfig.appKey,
+      useCookie: true,
+    });
+    window.aa('convertedObjectIDsAfterSearch', {
+      index: algoConfig.prefix + 'products',
+      eventName: 'PDP: Product added to cart',
+      queryID,
+      objectIDs: [objectID],
+    });
+  }
+}
+
+function AddToCartMarkup({queryID, objectID, algoConversion}) {
   const {selectedVariant} = useProductOptions();
   const isOutOfStock = !selectedVariant.availableForSale;
 
   return (
     <div className="space-y-2 mb-8">
-      <AddToCartButton
-        className={BUTTON_PRIMARY_CLASSES}
-        disabled={isOutOfStock}
+      <div
+        className="block m-0 w-full items-center justify-center"
+        aria-hidden="true"
+        onClick={() => sendConversion(queryID, objectID, algoConversion)}
       >
-        {isOutOfStock ? 'Out of stock' : 'Add to bag'}
-      </AddToCartButton>
+        <AddToCartButton
+          className={BUTTON_PRIMARY_CLASSES}
+          disabled={isOutOfStock}
+        >
+          {isOutOfStock ? 'Out of stock' : 'Add to bag'}
+        </AddToCartButton>
+      </div>
       {isOutOfStock ? (
         <p className="text-black text-center">Available in 2-3 weeks</p>
       ) : (
@@ -107,7 +131,12 @@ function ProductPrices({product}) {
   );
 }
 
-export default function ProductDetails({product}) {
+export default function ProductDetails({
+  algoConversion,
+  queryID,
+  objectID,
+  product,
+}) {
   const initialVariant = product.variants.nodes[0];
 
   const productMetafields = useParsedMetafields(product.metafields || {});
@@ -172,7 +201,12 @@ export default function ProductDetails({product}) {
                   Size Chart
                 </a>
               )}
-              <AddToCartMarkup />
+              {/* Adding algolia conversion parameters */}
+              <AddToCartMarkup
+                algoConversion={algoConversion}
+                objectID={objectID}
+                queryID={queryID}
+              />
               <div className="flex items space-x-4">
                 {sustainableMetafield?.value && (
                   <span className="flex items-center mb-8">

@@ -13,11 +13,17 @@ import ProductDetails from '../../components/ProductDetails.client';
 import NotFound from '../../components/NotFound.server';
 import Layout from '../../components/Layout.server';
 
-export default function Product() {
+export default function Product({request}) {
   const {handle} = useRouteParams();
   const {countryCode = 'US'} = useSession();
 
   const {languageCode} = useShop();
+
+  // Pass algolia search parameters to PDP page when conversion is made by Algolia
+  const url = new URL(request.normalizedUrl);
+  const queryID = url.searchParams.get('queryID');
+  const objectID = url.searchParams.get('objectID');
+  const algoConversion = Boolean(queryID) && Boolean(objectID);
 
   const {
     data: {product},
@@ -49,7 +55,12 @@ export default function Product() {
   return (
     <Layout>
       <Seo type="product" data={product} />
-      <ProductDetails product={product} />
+      <ProductDetails
+        algoConversion={algoConversion}
+        queryID={queryID}
+        objectID={objectID}
+        product={product}
+      />
     </Layout>
   );
 }
