@@ -1,3 +1,11 @@
+# Algolia Shopify integration
+
+Build Search and Discovery experience with Algolia, a Shopify Plus Certified Partner
+
+[Check out the docs](https://www.algolia.com/doc/integration/shopify/getting-started/quick-start/)
+
+[Configuration](https://www.algolia.com/doc/integration/shopify/getting-started/configuration/)
+
 # Hydrogen App
 
 Hydrogen is a React framework and SDK that you can use to build fast and dynamic Shopify custom storefronts.
@@ -6,8 +14,17 @@ Hydrogen is a React framework and SDK that you can use to build fast and dynamic
 
 [Run this template on StackBlitz](https://stackblitz.com/github/Shopify/hydrogen/tree/stackblitz/templates/demo-store)
 
+## Configuration for Hydrogen & Algolia
+- Algolia
+Update `algolia.config.json` with your Algolia APP ID & API KEY. 
+Update `algolia.config.json` with your shopify integration prefix ("shopify_" for example) and query sugguestion index name
+
+- Hydrogen
+Update `hydrogen.config.js` with your shop's domain and Storefront API token.
+
 ## What's in this template
 
+- Algolia InstantSearch & Autocomplete libraries
 - Styling with [Tailwind](https://tailwindcss.com/)
 - End-to-end testing with [Playwright](https://playwright.dev)
 - Unit testing with [Vitest](https://vitest.dev) and [Testing Library](https://testing-library.com)
@@ -25,8 +42,6 @@ Hydrogen is a React framework and SDK that you can use to build fast and dynamic
 yarn
 yarn dev
 ```
-
-Remember to update `hydrogen.config.js` with your shop's domain and Storefront API token!
 
 ## Previewing a production build
 
