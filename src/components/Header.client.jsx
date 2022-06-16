@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useRef} from 'react';
 import {Link} from '@shopify/hydrogen';
 
 import CartToggle from './CartToggle.client';
@@ -6,9 +6,9 @@ import {useCartUI} from './CartUIProvider.client';
 import AccountIcon from './account/AccountIcon';
 import CountrySelector from './CountrySelector.client';
 import Navigation from './Navigation.client';
-import MobileNavigation from './MobileNavigation.client';
 import SearchIcon from './SearchIcon';
 import CloseIcon from './CloseIcon';
+import MobileNavigation from './MobileNavigation.client';
 import AlgoliaAutocomplete from './search/AlgoliaAutocomplete.client';
 
 /**
@@ -19,6 +19,7 @@ export default function Header({collections, storeName}) {
   const [scrollbarWidth, setScrollbarWidth] = useState(0);
   const {isCartOpen} = useCartUI();
   const [hidden, setHidden] = useState(true);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     const scrollbarWidth =
@@ -72,15 +73,20 @@ export default function Header({collections, storeName}) {
           </div>
           <Navigation collections={collections} storeName={storeName} />
         </div>
-        {/* Add a Algolia Autocomplete panel */}
+        {/* Add a toggle search panel */}
         {!hidden ? (
-          <div className="flex h-auto w-full font-black mx-auto bg-white bg-opacity-95 rounded-md">
-            <div className="w-4/5 text-2xl mt-5 mb-5 content-center mx-auto">
-              <AlgoliaAutocomplete />
+          <div className="w-full bg-white bg-opacity-95 rounded-md">
+            <div className="flex h-auto w-full bg-white bg-opacity-95 rounded-md">
+              <div className="w-11/12 text-2xl mt-2 mb-2 mx-auto">
+                <AlgoliaAutocomplete dropdownRef={dropdownRef} />
+              </div>
             </div>
-            <button className="mr-3 mt-1" onClick={() => setHidden((s) => !s)}>
-              <CloseIcon />
-            </button>
+            <div className="flex h-auto w-full bg-white bg-opacity-95 rounded-md">
+              <div
+                className="w-11/12 mx-auto bg-white bg-opacity-95 rounded-md"
+                ref={dropdownRef}
+              />
+            </div>
           </div>
         ) : null}
       </div>

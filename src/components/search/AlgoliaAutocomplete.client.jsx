@@ -1,7 +1,3 @@
-/**
- * Algiolia Autocomplete component
- * https://www.algolia.com/doc/ui-libraries/autocomplete/introduction/what-is-autocomplete/
- */
 import React from 'react';
 import {getAlgoliaResults} from '@algolia/autocomplete-js';
 import algoliasearch from 'algoliasearch';
@@ -14,6 +10,7 @@ import {autocomplete} from '@algolia/autocomplete-js';
 import {Image} from '@shopify/hydrogen';
 import '@algolia/autocomplete-theme-classic';
 import algoConfig from '../../../algolia.config.json';
+import '../../search.css';
 
 const appId = algoConfig.appId;
 const apiKey = algoConfig.appKey;
@@ -37,9 +34,17 @@ const querySuggestionsPlugin = createQuerySuggestionsPlugin({
       ...source,
       getItemUrl({item}) {
         return '/search?q=' + item.query;
-      }, //keyboard navigation
+      },
       templates: {
         ...source.templates,
+        header() {
+          return (
+            <Fragment>
+              <span className="aa-SourceHeaderTitle">Sugguestions</span>
+              <div className="aa-SourceHeaderLine" />
+            </Fragment>
+          );
+        },
         item(params) {
           const {item, html} = params;
           return html`<a className="aa-ItemLink" href="/search?q=${item.query}">
@@ -84,10 +89,9 @@ function ProductItem({hit, components}) {
   );
 }
 
-export default function AlgoliaAutocomplete() {
+export default function AlgoliaAutocomplete({dropdownRef}) {
   const containerRef = useRef(null);
   const panelRootRef = useRef(null);
-  const rootRef = useRef(null);
   useEffect(() => {
     if (!containerRef.current) {
       return undefined;
@@ -100,6 +104,7 @@ export default function AlgoliaAutocomplete() {
       useCookie: true,
     });
     const algoliaInsightsPlugin = createAlgoliaInsightsPlugin({insightsClient});
+    let detached = false; //check if is detached view
     const search = autocomplete({
       container: containerRef.current,
       placeholder: 'Search for everything',
@@ -111,7 +116,7 @@ export default function AlgoliaAutocomplete() {
       ],
       onSubmit({state}) {
         window.location.replace('/search?q=' + state.query);
-      }, //keyboard navigation
+      },
       getSources({query}) {
         return [
           {
@@ -129,7 +134,7 @@ export default function AlgoliaAutocomplete() {
                   },
                 ],
               });
-            }, // Shopify collections index
+            },
             getItemUrl({item}) {
               return '/collections/' + item.handle;
             },
@@ -174,7 +179,7 @@ export default function AlgoliaAutocomplete() {
                   },
                 ],
               });
-            }, // Shopify pages index
+            },
             getItemUrl({item}) {
               return '/pages/' + item.handle;
             },
@@ -218,7 +223,7 @@ export default function AlgoliaAutocomplete() {
                   },
                 ],
               });
-            }, // Shopify products index
+            },
             getItemUrl({item}) {
               return (
                 '/products/' +
@@ -279,11 +284,21 @@ export default function AlgoliaAutocomplete() {
       },
       renderer: {createElement, Fragment, render: () => {}},
       render({elements}, root) {
-        if (!panelRootRef.current || rootRef.current !== root) {
-          rootRef.current = root;
-
+        if (!panelRootRef.current) {
+          panelRootRef.current = detached
+            ? createRoot(root)
+            : createRoot(dropdownRef.current);
+        }
+        let detachedState = Boolean(
+          root.parentElement &&
+            root.parentElement.className == 'aa-DetachedContainer',
+        );
+        if (detachedState != detached) {
           panelRootRef.current?.unmount();
-          panelRootRef.current = createRoot(root);
+          panelRootRef.current = detachedState
+            ? createRoot(root)
+            : createRoot(dropdownRef.current);
+          detached = detachedState;
         }
 
         const {
@@ -303,10 +318,6 @@ export default function AlgoliaAutocomplete() {
             <div className="flex">
               <div className="flex-auto mr-3 ml-3">
                 {recentSearchesPlugin}
-                <div className="aa-SourceHeader">
-                  <span className="aa-SourceHeaderTitle">Sugguestion</span>
-                  <div className="aa-SourceHeaderLine" />
-                </div>
                 {querySuggestionsPlugin} {collections} {pages}
               </div>
               <div className="flex-auto">
@@ -320,6 +331,6 @@ export default function AlgoliaAutocomplete() {
     return () => {
       search.destroy();
     };
-  }, []);
+  }, [dropdownRef]);
   return <div ref={containerRef} />;
 }

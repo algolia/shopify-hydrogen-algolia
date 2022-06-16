@@ -1,6 +1,6 @@
 import {
   useProductOptions,
-  useParsedMetafields,
+  parseMetafield,
   ProductPrice,
   AddToCartButton,
   BuyNowButton,
@@ -14,7 +14,6 @@ import {
 } from './Button.client';
 import algoConfig from '../../algolia.config.json';
 
-// Send conversion events to Algolia
 function sendConversion(queryID, objectID, sendEvent) {
   if (sendEvent) {
     window.aa('init', {
@@ -139,19 +138,10 @@ export default function ProductDetails({
 }) {
   const initialVariant = product.variants.nodes[0];
 
-  const productMetafields = useParsedMetafields(product.metafields || {});
-  const sizeChartMetafield = productMetafields.find(
-    (metafield) =>
-      metafield.namespace === 'my_fields' && metafield.key === 'size_chart',
-  );
-  const sustainableMetafield = productMetafields.find(
-    (metafield) =>
-      metafield.namespace === 'my_fields' && metafield.key === 'sustainable',
-  );
-  const lifetimeWarrantyMetafield = productMetafields.find(
-    (metafield) =>
-      metafield.namespace === 'my_fields' &&
-      metafield.key === 'lifetime_warranty',
+  const sizeChartMetafield = parseMetafield(product.meta_size_chart);
+  const sustainableMetafield = parseMetafield(product.meta_sustainable);
+  const lifetimeWarrantyMetafield = parseMetafield(
+    product.meta_lifetime_warranty,
   );
 
   return (
@@ -201,7 +191,6 @@ export default function ProductDetails({
                   Size Chart
                 </a>
               )}
-              {/* Adding algolia conversion parameters */}
               <AddToCartMarkup
                 algoConversion={algoConversion}
                 objectID={objectID}

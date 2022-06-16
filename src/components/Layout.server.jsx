@@ -3,14 +3,13 @@ import {
   useShopQuery,
   flattenConnection,
   LocalizationProvider,
-  CacheHours,
+  CacheShort,
   gql,
 } from '@shopify/hydrogen';
 
 import Header from './Header.client';
 import Footer from './Footer.server';
 import Cart from './Cart.client';
-import {Suspense} from 'react';
 
 /**
  * A server component that defines a structure and organization of a page that can be used in different parts of the Hydrogen app
@@ -24,7 +23,7 @@ export default function Layout({children, hero}) {
       language: languageCode,
       numCollections: 3,
     },
-    cache: CacheHours(),
+    cache: CacheShort(),
     preload: '*',
   });
   const collections = data ? flattenConnection(data.collections) : null;
@@ -42,15 +41,12 @@ export default function Layout({children, hero}) {
         </a>
       </div>
       <div className="min-h-screen max-w-screen text-gray-700 font-sans">
-        {/* TODO: Find out why Suspense needs to be here to prevent hydration errors. */}
-        <Suspense fallback={null}>
-          <Header collections={collections} storeName={storeName} />
-          <Cart />
-        </Suspense>
+        <Header collections={collections} storeName={storeName} />
+        <Cart />
         <main role="main" id="mainContent" className="relative bg-gray-50">
           {hero}
           <div className="mx-auto max-w-7xl p-4 md:py-5 md:px-8">
-            <Suspense fallback={null}>{children}</Suspense>
+            {children}
           </div>
         </main>
         <Footer collection={collections[0]} product={products[0]} />
