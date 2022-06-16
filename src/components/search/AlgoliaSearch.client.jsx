@@ -72,7 +72,7 @@ const Hit = ({hit, sendEvent}) => (
 );
 
 export default function AlgoliaSearch(props) {
-  var initialQuery = props.initialQuery; // workaround for react hooks routing re-initialization issue
+  let initialQuery = props.initialQuery ? props.initialQuery : ''; // workaround for react hooks routing re-initialization issue
   useEffect(() => {
     initialQuery = '';
   });
