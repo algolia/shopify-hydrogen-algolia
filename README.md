@@ -12,7 +12,9 @@ Hydrogen is a React framework and SDK that you can use to build fast and dynamic
 
 [Check out the docs](https://shopify.dev/custom-storefronts/hydrogen)
 
-[Run this template on StackBlitz](https://stackblitz.com/github/Shopify/hydrogen/tree/stackblitz/templates/demo-store)
+# Hydrogen & Algolia
+
+[Demo site](https://shopify-hydrogen-algolia-36172cef840994cbdf69.o2.myshopify.dev/)
 
 ## Configuration for Hydrogen & Algolia
 - Algolia
