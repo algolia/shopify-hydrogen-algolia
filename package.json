@@ -35,6 +35,7 @@
     "isbot": "^3.6.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-instantsearch-hooks-server": "^6.44.2",
     "react-instantsearch-hooks-web": "^6.44.2",
     "react-intersection-observer": "^9.4.1",
     "react-use": "^17.4.0",
