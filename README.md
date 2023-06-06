@@ -7,7 +7,7 @@ Now supporting Remixing Hydrogen v2 and full server-side rendering 🚀🚀🚀
   
 [Details](https://www.algolia.com/search-solutions/shopify/hydrogen/)   
 
-[Demo site](https://shopify-hydrogen-algolia-36172cef840994cbdf69.o2.myshopify.dev/)   
+[Demo site](https://shopify-hydrogen-algolia-ff7a0d8a34696233bb09.o2.myshopify.dev/)   
 
   
 
