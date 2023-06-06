@@ -24,3 +24,5 @@ export {FeaturedProducts} from './FeaturedProducts';
 export {AddToCartButton} from './AddToCartButton';
 // Sue me
 export * from './Icon';
+// adding Algolia Autocomplete
+export {Autocomplete} from './Autocomplete';

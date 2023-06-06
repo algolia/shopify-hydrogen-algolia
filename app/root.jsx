@@ -23,10 +23,12 @@ import {NotFound} from './components/NotFound';
 import styles from './styles/app.css';
 import {DEFAULT_LOCALE, parseMenu, getCartId} from './lib/utils';
 import {useAnalytics} from './hooks/useAnalytics';
+import autocompleteStyles from './styles/autocomplete.css';
 
 export const links = () => {
   return [
     {rel: 'stylesheet', href: styles},
+    {rel: 'stylesheet', href: autocompleteStyles},
     {
       rel: 'preconnect',
       href: 'https://cdn.shopify.com',

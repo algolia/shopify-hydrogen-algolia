@@ -20,6 +20,7 @@ import {
   Cart,
   CartLoading,
   Link,
+  Autocomplete,
 } from '~/components';
 import {useIsHomePath} from '~/lib/utils';
 import {useIsHydrated} from '~/hooks/useIsHydrated';
@@ -163,7 +164,7 @@ function MobileHeader({title, isHome, openCart, openMenu}) {
         >
           <IconMenu />
         </button>
-        <Form
+        {/* <Form
           method="get"
           action={params.locale ? `/${params.locale}/search` : '/search'}
           className="items-center gap-2 sm:flex"
@@ -185,7 +186,8 @@ function MobileHeader({title, isHome, openCart, openMenu}) {
             placeholder="Search"
             name="q"
           />
-        </Form>
+        </Form> */}
+        <Autocomplete />
       </div>
 
       <Link
@@ -244,7 +246,7 @@ function DesktopHeader({isHome, menu, openCart, title}) {
         </nav>
       </div>
       <div className="flex items-center gap-1">
-        <Form
+        {/* <Form
           method="get"
           action={params.locale ? `/${params.locale}/search` : '/search'}
           className="flex items-center gap-2"
@@ -266,7 +268,8 @@ function DesktopHeader({isHome, menu, openCart, title}) {
           >
             <IconSearch />
           </button>
-        </Form>
+        </Form> */}
+        <Autocomplete />
         <AccountLink className="relative flex items-center justify-center w-8 h-8 focus:ring-primary/5" />
         <CartCount isHome={isHome} openCart={openCart} />
       </div>
