@@ -118,9 +118,9 @@ yarn build
 
 ## Algolia related codes
   
--  `app/routes/($locale).search.jsx` using Algolia [React InstantSearch Hooks] (https://www.algolia.com/doc/guides/building-search-ui/what-is-instantsearch/react-hooks/) to power Hydrogen's search page with Algolia   
+-  `app/routes/($locale).search.jsx` using Algolia [React InstantSearch Hooks](https://www.algolia.com/doc/guides/building-search-ui/what-is-instantsearch/react-hooks/) to power Hydrogen's search page with Algolia   
    
--  `app/routes/($locale).collections.$collectionHandle.jsx` using Algolia [React InstantSearch Hooks] (https://www.algolia.com/doc/guides/building-search-ui/what-is-instantsearch/react-hooks/) to power Hydrogen's collection pages with Algolia   
+-  `app/routes/($locale).collections.$collectionHandle.jsx` using Algolia [React InstantSearch Hooks](https://www.algolia.com/doc/guides/building-search-ui/what-is-instantsearch/react-hooks/) to power Hydrogen's collection pages with Algolia   
    
 -  `app/components/Autocomplete.jsx` creates federated search bar component using Algolia [Autocomplete](https://www.algolia.com/doc/api-reference/widgets/react-hooks/)   
     
