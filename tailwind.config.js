@@ -1,24 +1,16 @@
-/* We  */
-/* Tailwind Configuration Docs: https://tailwindcss.com/docs/configuration */
+import formsPlugin from '@tailwindcss/forms';
+import typographyPlugin from '@tailwindcss/typography';
 
-function withOpacityValue(variable) {
-  return ({opacityValue}) => {
-    if (opacityValue === undefined) {
-      return `rgb(var(${variable}))`;
-    }
-    return `rgb(var(${variable}) / ${opacityValue})`;
-  };
-}
-
-module.exports = {
-  content: ['./index.html', './src/**/*.{js,jsx,ts,tsx}'],
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: ['./app/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
       colors: {
-        primary: withOpacityValue('--color-primary'),
-        contrast: withOpacityValue('--color-contrast'),
-        notice: withOpacityValue('--color-accent'),
-        shopPay: 'var(--color-shop-pay)',
+        primary: 'rgb(var(--color-primary) / <alpha-value>)',
+        contrast: 'rgb(var(--color-contrast) / <alpha-value>)',
+        notice: 'rgb(var(--color-accent) / <alpha-value>)',
+        shopPay: 'rgb(var(--color-shop-pay) / <alpha-value>)',
       },
       screens: {
         sm: '32em',
@@ -68,6 +60,5 @@ module.exports = {
       },
     },
   },
-  // eslint-disable-next-line node/no-unpublished-require
-  plugins: [require('@tailwindcss/forms'), require('@tailwindcss/typography')],
+  plugins: [formsPlugin, typographyPlugin],
 };
