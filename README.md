@@ -148,7 +148,7 @@ Server-side rendering InstantSearch can be integrated in Hydrogen Remix.
    
 The implementation is possible for any Hydrogen pages.   
    
-[Tutoriel]https://www.algolia.com/doc/guides/building-search-ui/going-further/server-side-rendering/react-hooks/)   
+[Tutoriel](https://www.algolia.com/doc/guides/building-search-ui/going-further/server-side-rendering/react-hooks/)   
    
 ### Implement Autocomplete for federated search bar
    
