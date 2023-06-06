@@ -1,250 +1,262 @@
-import {json} from '@shopify/remix-oxygen';
 import {useLoaderData} from '@remix-run/react';
-import {flattenConnection, AnalyticsPageType} from '@shopify/hydrogen';
+import algoliasearch from 'algoliasearch/dist/algoliasearch-lite.esm.browser';
+import {createFetchRequester} from '@algolia/requester-fetch';
+import {Image} from '@shopify/hydrogen';
+import {PageHeader} from '~/components';
 import invariant from 'tiny-invariant';
+import {
+  InstantSearch,
+  InstantSearchSSRProvider,
+  SearchBox,
+  Pagination,
+  Highlight,
+  Hits,
+  RefinementList,
+  SortBy,
+  HitsPerPage,
+  ClearRefinements,
+  RangeInput,
+  Configure,
+} from 'react-instantsearch-hooks-web';
+import {renderToString} from 'react-dom/server';
+import {getServerState} from 'react-instantsearch-hooks-server';
+import {history} from 'instantsearch.js/cjs/lib/routers/index.js';
+import algoConfig from '../../algolia.config.json';
+import styles from '../styles/search.css';
 
-import {PageHeader, Section, Text, SortFilter} from '~/components';
-import {ProductGrid} from '~/components/ProductGrid';
-import {PRODUCT_CARD_FRAGMENT} from '~/data/fragments';
-import {CACHE_SHORT, routeHeaders} from '~/data/cache';
-import {seoPayload} from '~/lib/seo.server';
+export const links = () => {
+  return [{rel: 'stylesheet', href: styles}];
+};
 
-export const headers = routeHeaders;
-
-const PAGINATION_SIZE = 48;
+const appId = algoConfig.appId;
+const apiKey = algoConfig.appKey;
+const searchClient = algoliasearch(appId, apiKey, {
+  requester: createFetchRequester(),
+});
 
 export async function loader({params, request, context}) {
+  const serverUrl = request.url;
   const {collectionHandle} = params;
-
   invariant(collectionHandle, 'Missing collectionHandle param');
-
-  const searchParams = new URL(request.url).searchParams;
-  const knownFilters = ['productVendor', 'productType'];
-  const available = 'available';
-  const variantOption = 'variantOption';
-  const {sortKey, reverse} = getSortValuesFromParam(searchParams.get('sort'));
-  const cursor = searchParams.get('cursor');
-  const filters = [];
-  const appliedFilters = [];
-
-  for (const [key, value] of searchParams.entries()) {
-    if (available === key) {
-      filters.push({available: value === 'true'});
-      appliedFilters.push({
-        label: value === 'true' ? 'In stock' : 'Out of stock',
-        urlParam: {
-          key: available,
-          value,
-        },
-      });
-    } else if (knownFilters.includes(key)) {
-      filters.push({[key]: value});
-      appliedFilters.push({label: value, urlParam: {key, value}});
-    } else if (key.includes(variantOption)) {
-      const [name, val] = value.split(':');
-      filters.push({variantOption: {name, value: val}});
-      appliedFilters.push({label: val, urlParam: {key, value}});
-    }
-  }
-
-  // Builds min and max price filter since we can't stack them separately into
-  // the filters array. See price filters limitations:
-  // https://shopify.dev/custom-storefronts/products-collections/filter-products#limitations
-  if (searchParams.has('minPrice') || searchParams.has('maxPrice')) {
-    const price = {};
-    if (searchParams.has('minPrice')) {
-      price.min = Number(searchParams.get('minPrice')) || 0;
-      appliedFilters.push({
-        label: `Min: $${price.min}`,
-        urlParam: {key: 'minPrice', value: searchParams.get('minPrice')},
-      });
-    }
-    if (searchParams.has('maxPrice')) {
-      price.max = Number(searchParams.get('maxPrice')) || 0;
-      appliedFilters.push({
-        label: `Max: $${price.max}`,
-        urlParam: {key: 'maxPrice', value: searchParams.get('maxPrice')},
-      });
-    }
-    filters.push({
-      price,
-    });
-  }
-
-  const {collection, collections} = await context.storefront.query(
-    COLLECTION_QUERY,
+  const serverState = await getServerState(
+    <AlgoliaSearch serverUrl={serverUrl} collection={collectionHandle} />,
     {
-      variables: {
-        handle: collectionHandle,
-        pageBy: PAGINATION_SIZE,
-        cursor,
-        filters,
-        sortKey,
-        reverse,
-        country: context.storefront.i18n.country,
-        language: context.storefront.i18n.language,
-      },
+      renderToString,
     },
   );
-
-  if (!collection) {
-    throw new Response('collection', {status: 404});
-  }
-
-  const collectionNodes = flattenConnection(collections);
-  const seo = seoPayload.collection({collection, url: request.url});
-
-  return json(
-    {
-      collection,
-      appliedFilters,
-      collections: collectionNodes,
-      analytics: {
-        pageType: AnalyticsPageType.collection,
-        collectionHandle,
-        resourceId: collection.id,
-      },
-      seo,
-    },
-    {
-      headers: {
-        'Cache-Control': CACHE_SHORT,
-      },
-    },
-  );
+  return {
+    serverState,
+    serverUrl,
+    collectionHandle,
+  };
 }
 
-export default function Collection() {
-  const {collection, collections, appliedFilters} = useLoaderData();
+function AlgoliaSearch({serverState, serverUrl, collection}) {
+  const indexName = algoConfig.prefix + 'products';
+  const routing = {
+    router: history({
+      getLocation() {
+        if (typeof window === 'undefined') {
+          return new URL(serverUrl);
+        }
 
+        return window.location;
+      },
+    }),
+    stateMapping: {
+      stateToRoute(uiState) {
+        const indexUiState = uiState[indexName];
+        return {
+          q: indexUiState.query,
+          page: indexUiState.page,
+        };
+      },
+      routeToState(routeState) {
+        return {
+          [indexName]: {
+            query: routeState.q,
+            page: routeState.page,
+          },
+        };
+      },
+    },
+  };
+
+  const Hit = ({hit, sendEvent}) => (
+    <a
+      href={
+        '/products/' +
+        hit.handle +
+        '?queryID=' +
+        hit.__queryID +
+        '&objectID=' +
+        hit.objectID
+      }
+      onClick={() => {
+        sendEvent('click', hit, 'PLP: Product Clicked');
+      }}
+    >
+      <header className="hit-image-container">
+        <Image src={hit.image} alt={hit.title} width="180px" height="auto" />
+      </header>
+      <div className="hit-info-container">
+        <p className="hit-category">{hit.product_type}</p>
+        <h1>
+          <Highlight attribute="title" hit={hit} />
+        </h1>
+        <footer>
+          <p>
+            <span className="hit-em">$</span> <strong>{hit.price}</strong>{' '}
+          </p>
+        </footer>
+      </div>
+    </a>
+  );
   return (
     <>
-      <PageHeader heading={collection.title}>
-        {collection?.description && (
-          <div className="flex items-baseline justify-between w-full">
-            <div>
-              <Text format width="narrow" as="p" className="inline-block">
-                {collection.description}
-              </Text>
-            </div>
-          </div>
-        )}
-      </PageHeader>
-      <Section>
-        <SortFilter
-          filters={collection.products.filters}
-          appliedFilters={appliedFilters}
-          collections={collections}
+      <InstantSearchSSRProvider {...serverState}>
+        <InstantSearch
+          searchClient={searchClient}
+          indexName={indexName}
+          routing={routing}
+          insights={true}
         >
-          <ProductGrid
-            key={collection.id}
-            collection={collection}
-            url={`/collections/${collection.handle}`}
-            data-test="product-grid"
-          />
-        </SortFilter>
-      </Section>
+          <Configure filters={"collections:'" + collection + "'"} />
+          <PageHeader heading={collection}></PageHeader>
+          <header className="header">
+            <SearchBox
+              submit={
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 18 18"
+                >
+                  <g
+                    fill="none"
+                    fillRule="evenodd"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="1.67"
+                    transform="translate(1 1)"
+                  >
+                    <circle cx="7.11" cy="7.11" r="7.11" />
+                    <path d="M16 16l-3.87-3.87" />
+                  </g>
+                </svg>
+              }
+            />
+          </header>
+          <main className="container">
+            <div className="container-wrapper">
+              <section className="container-filters">
+                <div className="container-header">
+                  <h2>Filters</h2>
+                  <div className="clear-filters">
+                    <ClearRefinements
+                      translations={{
+                        reset: (
+                          <>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="11"
+                              height="11"
+                              viewBox="0 0 11 11"
+                            >
+                              <g fill="none" fillRule="evenodd" opacity=".4">
+                                <path d="M0 0h11v11H0z" />
+                                <path
+                                  fill="#000"
+                                  fillRule="nonzero"
+                                  d="M8.26 2.75a3.896 3.896 0 1 0 1.102 3.262l.007-.056a.49.49 0 0 1 .485-.456c.253 0 .451.206.437.457 0 0 .012-.109-.006.061a4.813 4.813 0 1 1-1.348-3.887v-.987a.458.458 0 1 1 .917.002v2.062a.459.459 0 0 1-.459.459H7.334a.458.458 0 1 1-.002-.917h.928z"
+                                />
+                              </g>
+                            </svg>
+                            Clear filters
+                          </>
+                        ),
+                      }}
+                    />
+                  </div>
+                </div>
+                <div className="container-body">
+                  <div className="ais-Panel-header">Brands</div>
+                  <RefinementList
+                    attribute="vendor"
+                    searchable={true}
+                    showMore={true}
+                    placeholder="Search for brands…"
+                  />
+                </div>
+                <div className="ais-Panel-header">Categories</div>
+                <RefinementList attribute="product_type" showMore={true} />
+                <div className="ais-Panel-header">Price</div>
+                <RangeInput attribute="price" />
+              </section>
+            </div>
+            <section className="container-results">
+              <header className="container-header container-options">
+                <SortBy
+                  className="container-option"
+                  // Get sorting indices from shopify integration
+                  items={[
+                    {
+                      label: 'Sort by featured',
+                      value: algoConfig.prefix + 'products',
+                    },
+                    {
+                      label: 'Price ascending',
+                      value: algoConfig.prefix + 'products_price_asc',
+                    },
+                    {
+                      label: 'Price descending',
+                      value: algoConfig.prefix + 'products_price_desc',
+                    },
+                    {
+                      label: 'Recently added',
+                      value: algoConfig.prefix + 'products_published_at_desc',
+                    },
+                  ]}
+                />
+                <HitsPerPage
+                  className="container-option"
+                  items={[
+                    {
+                      label: '16 hits per page',
+                      value: 16,
+                      default: true,
+                    },
+                    {
+                      label: '32 hits per page',
+                      value: 32,
+                    },
+                    {
+                      label: '64 hits per page',
+                      value: 64,
+                    },
+                  ]}
+                />
+              </header>
+              <Hits hitComponent={Hit} />
+              <footer className="container-footer">
+                <Pagination padding={2} />
+              </footer>
+            </section>
+          </main>
+        </InstantSearch>
+      </InstantSearchSSRProvider>
     </>
   );
 }
 
-const COLLECTION_QUERY = `#graphql
-  query CollectionDetails(
-    $handle: String!
-    $country: CountryCode
-    $language: LanguageCode
-    $pageBy: Int!
-    $cursor: String
-    $filters: [ProductFilter!]
-    $sortKey: ProductCollectionSortKeys!
-    $reverse: Boolean
-  ) @inContext(country: $country, language: $language) {
-    collection(handle: $handle) {
-      id
-      handle
-      title
-      description
-      seo {
-        description
-        title
-      }
-      image {
-        id
-        url
-        width
-        height
-        altText
-      }
-      products(
-        first: $pageBy,
-        after: $cursor,
-        filters: $filters,
-        sortKey: $sortKey,
-        reverse: $reverse
-      ) {
-        filters {
-          id
-          label
-          type
-          values {
-            id
-            label
-            count
-            input
-          }
-        }
-        nodes {
-          ...ProductCard
-        }
-        pageInfo {
-          hasNextPage
-          endCursor
-        }
-      }
-    }
-    collections(first: 100) {
-      edges {
-        node {
-          title
-          handle
-        }
-      }
-    }
-  }
-  ${PRODUCT_CARD_FRAGMENT}
-`;
-
-function getSortValuesFromParam(sortParam) {
-  switch (sortParam) {
-    case 'price-high-low':
-      return {
-        sortKey: 'PRICE',
-        reverse: true,
-      };
-    case 'price-low-high':
-      return {
-        sortKey: 'PRICE',
-        reverse: false,
-      };
-    case 'best-selling':
-      return {
-        sortKey: 'BEST_SELLING',
-        reverse: false,
-      };
-    case 'newest':
-      return {
-        sortKey: 'CREATED',
-        reverse: true,
-      };
-    case 'featured':
-      return {
-        sortKey: 'MANUAL',
-        reverse: false,
-      };
-    default:
-      return {
-        sortKey: 'RELEVANCE',
-        reverse: false,
-      };
-  }
+export default function Search() {
+  const {serverState, serverUrl, collectionHandle} = useLoaderData();
+  return (
+    <AlgoliaSearch
+      serverState={serverState}
+      serverUrl={serverUrl}
+      collection={collectionHandle}
+    />
+  );
 }
