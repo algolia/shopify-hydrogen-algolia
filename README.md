@@ -1,10 +1,17 @@
+# Algolia + Shopify Hydrogen
+
+Lightning fast search experiences on Shopify’s headless architecture
+Now supporting Remixing Hydrogen v2 and full server-side rendering 🚀🚀🚀 
+
+[Details](https://www.algolia.com/search-solutions/shopify/hydrogen/)
+[Demo site](https://shopify-hydrogen-algolia-36172cef840994cbdf69.o2.myshopify.dev/)
+
 # Algolia Shopify integration
 
 Build Search and Discovery experience with Algolia, a Shopify Plus Certified Partner
 
-[Check out the docs](https://www.algolia.com/doc/integration/shopify/getting-started/quick-start/)
-
-[Configuration](https://www.algolia.com/doc/integration/shopify/getting-started/configuration/)
+[Quick Start](https://www.algolia.com/doc/integration/shopify/getting-started/quick-start/)
+[Configuration steps](https://www.algolia.com/doc/integration/shopify/getting-started/configuration/)
 
 # Hydrogen App
 
@@ -12,29 +19,33 @@ Hydrogen is a React framework and SDK that you can use to build fast and dynamic
 
 [Check out the docs](https://shopify.dev/custom-storefronts/hydrogen)
 
-# Hydrogen & Algolia
-
-[Demo site](https://shopify-hydrogen-algolia-36172cef840994cbdf69.o2.myshopify.dev/)
-
-## Configuration for Hydrogen & Algolia
-- Algolia
-
-Update `algolia.config.json` with your Algolia APP ID & API KEY. 
-
-Update `algolia.config.json` with your shopify integration prefix ("shopify_" for example) and query sugguestion index name.
-
-- Hydrogen
-
-Update `hydrogen.config.js` with your shop's domain and Storefront API token.
+# Tutoriel
 
 ## What's in this template
 
-- Algolia InstantSearch & Autocomplete libraries
-- Styling with [Tailwind](https://tailwindcss.com/)
-- End-to-end testing with [Playwright](https://playwright.dev)
-- Unit testing with [Vitest](https://vitest.dev) and [Testing Library](https://testing-library.com)
-- Code formatting with [Prettier](https://prettier.io)
-- Javascript linting with [ESLint](https://eslint.org) and the Hydrogen [ESLint plugin](https://github.com/Shopify/hydrogen/tree/main/packages/eslint-plugin)
+- Algolia [React InstantSearch Hooks](https://www.algolia.com/doc/api-reference/widgets/react-hooks/) for search and collection pages
+- Algolia [Autocomplete](https://www.algolia.com/doc/api-reference/widgets/react-hooks/) for federated search bar
+- Hydrogen [demo store](https://hydrogen.shop/)
+
+## Getting started to index your data
+
+Algolia for Shopify is a Shopify Plus certified app. 
+To index your data, the extension calls the Shopify API and uses Shopify webhooks.
+
+[Quick Start](https://www.algolia.com/doc/integration/shopify/getting-started/quick-start/)
+
+## Generating Query Sugguestion index for autocomplete
+
+The template supports Query Suggestion in search bar.
+Check out the [tutoriel](https://www.algolia.com/doc/guides/building-search-ui/ui-and-ux-patterns/query-suggestions/how-to/creating-a-query-suggestions-index/react-hooks/) to generate a query sugguestion index (optional)
+
+## Update the configuration file
+
+`algolia.config.json` contains Algolia related configuration
+
+Update `algolia.config.json` with your Algolia APP ID & API KEY. 
+Update `algolia.config.json` with your shopify extension prefix ("shopify_" for example) and query sugguestion index name.
+
 
 ## Getting started
 
@@ -62,19 +73,31 @@ yarn preview
 ```bash
 yarn build
 ```
+## Algolia related codes
 
-## Running tests
+- `app/routes/($locale).search.jsx` using Algolia [React InstantSearch Hooks] (https://www.algolia.com/doc/guides/building-search-ui/what-is-instantsearch/react-hooks/) to power Hydrogen's search page with Algolia
+- `app/routes/($locale).collections.$collectionHandle.jsx` using Algolia [React InstantSearch Hooks] (https://www.algolia.com/doc/guides/building-search-ui/what-is-instantsearch/react-hooks/) to power Hydrogen's collection pages with Algolia
+- `app/components/Autocomplete.jsx` creates federated search bar component using Algolia [Autocomplete](https://www.algolia.com/doc/api-reference/widgets/react-hooks/)
+- `app/styles/search.css` and `app/styles/autocomplete.css`
 
-This project contains basic end-to-end (E2E) tests in the `/tests/e2e` folder powered by [Vitest](https://vitest.dev).
+## Build your own hydrogen storefront with Algolia
 
-You can run tests in development, and they will automatically reload when you make changes to the component you provide to `hydrogen.watchForUpdates()`:
+### Install Algolia related libraries
 
-```bash
-yarn test
-```
+[React InstantSearch Hooks](https://www.algolia.com/doc/api-reference/widgets/react-hooks/)
+yarn add algoliasearch react-instantsearch-hooks-web react-instantsearch-hooks-server @algolia/requester-fetch
 
-To run tests in a continuous-integration (CI) environment like GitHub Actions:
+[Autocomplete](https://www.algolia.com/doc/api-reference/widgets/react-hooks/)
+yarn add algoliasearch @algolia/autocomplete-js @algolia/autocomplete-plugin-query-suggestions @algolia/autocomplete-plugin-recent-searches
 
-```bash
-yarn test:ci
-```
+### Implement InstantSearch for search and browse
+
+Server-side rendering InstantSearch can be integrated in Hydrogen Remix.
+The implementation is possible for any Hydrogen pages.
+[Tutoriel]https://www.algolia.com/doc/guides/building-search-ui/going-further/server-side-rendering/react-hooks/)
+
+### Implement Autocomplete for federated search bar
+
+Autocomplete is client-side only and needs to be mounted when the page renders.
+[Mount Autocomplete with React](https://www.algolia.com/doc/ui-libraries/autocomplete/integrations/using-react/)
+
