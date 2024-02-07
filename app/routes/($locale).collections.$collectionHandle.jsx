@@ -17,10 +17,10 @@ import {
   ClearRefinements,
   RangeInput,
   Configure,
-} from 'react-instantsearch-hooks-web';
+  getServerState
+} from 'react-instantsearch';
 import {renderToString} from 'react-dom/server';
-import {getServerState} from 'react-instantsearch-hooks-server';
-import {history} from 'instantsearch.js/cjs/lib/routers/index.js';
+import {history} from 'instantsearch.js/es/lib/routers';
 import algoConfig from '../../algolia.config.json';
 import styles from '../styles/search.css';
 
@@ -34,7 +34,7 @@ const searchClient = algoliasearch(appId, apiKey, {
   requester: createFetchRequester(),
 });
 
-export async function loader({params, request, context}) {
+export async function loader({params, request}) {
   const serverUrl = request.url;
   const {collectionHandle} = params;
   invariant(collectionHandle, 'Missing collectionHandle param');

@@ -53,7 +53,10 @@ export function Autocomplete(props) {
             },
             item(params) {
               const {item, html} = params;
-              return html`<a class="aa-ItemLink" href="/search?q=${item.query}">
+              return html`<a
+                className="aa-ItemLink"
+                href="/search?q=${item.query}"
+              >
                 ${source.templates.item(params).props.children}
               </a>`;
             },
@@ -87,7 +90,8 @@ export function Autocomplete(props) {
       container: containerRef.current,
       placeholder: 'Search',
       plugins: [recentSearchesPlugin, querySuggestionsPlugin],
-      detachedMediaQuery: 'none',
+      openOnFocus: true,
+      // detachedMediaQuery: 'none',
       onSubmit({state}) {
         window.location.replace('/search?q=' + state.query);
       },
