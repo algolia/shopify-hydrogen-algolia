@@ -3,6 +3,7 @@ import {parse as parseCookie} from 'worktop/cookie';
 import typographicBase from 'typographic-base';
 
 import {countries} from '~/data/countries';
+import algoConfig from '../../algolia.config.json';
 
 export function missingClass(string, prefix) {
   if (!string) {
@@ -243,6 +244,11 @@ export function getLocaleFromRequest(request) {
         ...countries['default'],
         pathPrefix: '',
       };
+}
+
+export function getAlgoliaIndexName(type, pathPrefix) {
+  const suffix = algoConfig.marketsIndexSuffixes?.[pathPrefix];
+  return algoConfig.prefix + type + (suffix ? '_' + suffix : '');
 }
 
 export function usePrefixPathWithLocale(path) {

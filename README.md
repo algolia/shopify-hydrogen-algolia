@@ -66,6 +66,8 @@ Update `algolia.config.json` with your Algolia APP ID & API KEY.
    
 Update `algolia.config.json` with your shopify extension prefix ("shopify_" for example) and query sugguestion index name.   
 
+If you use [Markets indexing](https://www.algolia.com/doc/integration/shopify/sending-and-managing-data/markets/), map each locale path prefix from `app/data/countries.js` to the Markets Index Suffix shown under Markets Indexing in the Algolia app, e.g. `"marketsIndexSuffixes": {"/en-ca": "<suffix>"}`.
+
 ## Getting started
 
 **Requirements:**

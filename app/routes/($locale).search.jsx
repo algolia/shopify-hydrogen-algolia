@@ -20,6 +20,7 @@ import {
 import {renderToString} from 'react-dom/server';
 import {history} from 'instantsearch.js/es/lib/routers';
 import algoConfig from '../../algolia.config.json';
+import {getAlgoliaIndexName} from '~/lib/utils';
 import styles from '../styles/search.css';
 
 export const links = () => {
@@ -35,7 +36,10 @@ const searchClient = algoliasearch(appId, apiKey, {
 export async function loader({request, context: {storefront}}) {
   const serverUrl = request.url;
   const serverState = await getServerState(
-    <AlgoliaSearch serverUrl={serverUrl} />,
+    <AlgoliaSearch
+      serverUrl={serverUrl}
+      pathPrefix={storefront.i18n.pathPrefix}
+    />,
     {
       renderToString,
     },
@@ -43,11 +47,12 @@ export async function loader({request, context: {storefront}}) {
   return {
     serverState,
     serverUrl,
+    pathPrefix: storefront.i18n.pathPrefix,
   };
 }
 
-function AlgoliaSearch({serverState, serverUrl}) {
-  const indexName = algoConfig.prefix + 'products';
+function AlgoliaSearch({serverState, serverUrl, pathPrefix}) {
+  const indexName = getAlgoliaIndexName('products', pathPrefix);
   const routing = {
     router: history({
       getLocation() {
@@ -203,19 +208,19 @@ function AlgoliaSearch({serverState, serverUrl}) {
                   items={[
                     {
                       label: 'Sort by featured',
-                      value: algoConfig.prefix + 'products',
+                      value: indexName,
                     },
                     {
                       label: 'Price ascending',
-                      value: algoConfig.prefix + 'products_price_asc',
+                      value: indexName + '_price_asc',
                     },
                     {
                       label: 'Price descending',
-                      value: algoConfig.prefix + 'products_price_desc',
+                      value: indexName + '_price_desc',
                     },
                     {
                       label: 'Recently added',
-                      value: algoConfig.prefix + 'products_published_at_desc',
+                      value: indexName + '_published_at_desc',
                     },
                   ]}
                 />
@@ -251,6 +256,12 @@ function AlgoliaSearch({serverState, serverUrl}) {
 }
 
 export default function Search() {
-  const {serverState, serverUrl} = useLoaderData();
-  return <AlgoliaSearch serverState={serverState} serverUrl={serverUrl} />;
+  const {serverState, serverUrl, pathPrefix} = useLoaderData();
+  return (
+    <AlgoliaSearch
+      serverState={serverState}
+      serverUrl={serverUrl}
+      pathPrefix={pathPrefix}
+    />
+  );
 }

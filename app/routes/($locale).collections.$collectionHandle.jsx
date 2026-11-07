@@ -22,6 +22,7 @@ import {
 import {renderToString} from 'react-dom/server';
 import {history} from 'instantsearch.js/es/lib/routers';
 import algoConfig from '../../algolia.config.json';
+import {getAlgoliaIndexName} from '~/lib/utils';
 import styles from '../styles/search.css';
 
 export const links = () => {
@@ -34,12 +35,16 @@ const searchClient = algoliasearch(appId, apiKey, {
   requester: createFetchRequester(),
 });
 
-export async function loader({params, request}) {
+export async function loader({params, request, context: {storefront}}) {
   const serverUrl = request.url;
   const {collectionHandle} = params;
   invariant(collectionHandle, 'Missing collectionHandle param');
   const serverState = await getServerState(
-    <AlgoliaSearch serverUrl={serverUrl} collection={collectionHandle} />,
+    <AlgoliaSearch
+      serverUrl={serverUrl}
+      collection={collectionHandle}
+      pathPrefix={storefront.i18n.pathPrefix}
+    />,
     {
       renderToString,
     },
@@ -48,11 +53,12 @@ export async function loader({params, request}) {
     serverState,
     serverUrl,
     collectionHandle,
+    pathPrefix: storefront.i18n.pathPrefix,
   };
 }
 
-function AlgoliaSearch({serverState, serverUrl, collection}) {
-  const indexName = algoConfig.prefix + 'products';
+function AlgoliaSearch({serverState, serverUrl, collection, pathPrefix}) {
+  const indexName = getAlgoliaIndexName('products', pathPrefix);
   const routing = {
     router: history({
       getLocation() {
@@ -203,19 +209,19 @@ function AlgoliaSearch({serverState, serverUrl, collection}) {
                   items={[
                     {
                       label: 'Sort by featured',
-                      value: algoConfig.prefix + 'products',
+                      value: indexName,
                     },
                     {
                       label: 'Price ascending',
-                      value: algoConfig.prefix + 'products_price_asc',
+                      value: indexName + '_price_asc',
                     },
                     {
                       label: 'Price descending',
-                      value: algoConfig.prefix + 'products_price_desc',
+                      value: indexName + '_price_desc',
                     },
                     {
                       label: 'Recently added',
-                      value: algoConfig.prefix + 'products_published_at_desc',
+                      value: indexName + '_published_at_desc',
                     },
                   ]}
                 />
@@ -251,12 +257,14 @@ function AlgoliaSearch({serverState, serverUrl, collection}) {
 }
 
 export default function Search() {
-  const {serverState, serverUrl, collectionHandle} = useLoaderData();
+  const {serverState, serverUrl, collectionHandle, pathPrefix} =
+    useLoaderData();
   return (
     <AlgoliaSearch
       serverState={serverState}
       serverUrl={serverUrl}
       collection={collectionHandle}
+      pathPrefix={pathPrefix}
     />
   );
 }

@@ -1,6 +1,7 @@
 import {getAlgoliaResults} from '@algolia/autocomplete-js';
 import algoliasearch from 'algoliasearch/dist/algoliasearch-lite.esm.browser';
 import {useEffect, useRef, createElement, Fragment} from 'react';
+import {useMatches} from '@remix-run/react';
 import {createRoot} from 'react-dom/client';
 import {createQuerySuggestionsPlugin} from '@algolia/autocomplete-plugin-query-suggestions';
 import {createLocalStorageRecentSearchesPlugin} from '@algolia/autocomplete-plugin-recent-searches';
@@ -8,6 +9,7 @@ import {autocomplete} from '@algolia/autocomplete-js';
 import {createFetchRequester} from '@algolia/requester-fetch';
 import {Image} from '@shopify/hydrogen';
 import algoConfig from '../../algolia.config.json';
+import {DEFAULT_LOCALE, getAlgoliaIndexName} from '~/lib/utils';
 
 const appId = algoConfig.appId;
 const apiKey = algoConfig.appKey;
@@ -19,10 +21,14 @@ export function Autocomplete(props) {
   const containerRef = useRef(null);
   const panelRootRef = useRef(null);
   const rootRef = useRef(null);
+  const [root] = useMatches();
+  const {pathPrefix} = root.data?.selectedLocale ?? DEFAULT_LOCALE;
   useEffect(() => {
     if (!containerRef.current) {
       return undefined;
     }
+    const getSearchUrl = (query) =>
+      `${pathPrefix}/search?q=${encodeURIComponent(query)}`;
     // Create recent search plugin
     const recentSearchesPlugin = createLocalStorageRecentSearchesPlugin({
       key: 'hydrogen-algolia',
@@ -40,7 +46,7 @@ export function Autocomplete(props) {
         return {
           ...source,
           getItemUrl({item}) {
-            return `/search?q=${item.query}`;
+            return getSearchUrl(item.query);
           },
           templates: {
             header() {
@@ -55,7 +61,7 @@ export function Autocomplete(props) {
               const {item, html} = params;
               return html`<a
                 className="aa-ItemLink"
-                href="/search?q=${item.query}"
+                href=${getSearchUrl(item.query)}
               >
                 ${source.templates.item(params).props.children}
               </a>`;
@@ -93,7 +99,7 @@ export function Autocomplete(props) {
       openOnFocus: true,
       // detachedMediaQuery: 'none',
       onSubmit({state}) {
-        window.location.replace('/search?q=' + state.query);
+        window.location.replace(getSearchUrl(state.query));
       },
       getSources({query}) {
         return [
@@ -104,7 +110,7 @@ export function Autocomplete(props) {
                 searchClient,
                 queries: [
                   {
-                    indexName: algoConfig.prefix + 'collections',
+                    indexName: getAlgoliaIndexName('collections', pathPrefix),
                     query,
                     params: {
                       hitsPerPage: 3,
@@ -191,7 +197,7 @@ export function Autocomplete(props) {
                 searchClient,
                 queries: [
                   {
-                    indexName: algoConfig.prefix + 'products',
+                    indexName: getAlgoliaIndexName('products', pathPrefix),
                     query,
                     params: {
                       hitsPerPage: 4,
@@ -227,7 +233,7 @@ export function Autocomplete(props) {
               return [
                 {
                   title: 'Search in all products',
-                  url: '/search?q=' + query,
+                  url: getSearchUrl(query),
                 },
               ];
             },
@@ -291,6 +297,6 @@ export function Autocomplete(props) {
     return () => {
       search.destroy();
     };
-  }, [props]);
+  }, [props, pathPrefix]);
   return <div ref={containerRef} />;
 }
