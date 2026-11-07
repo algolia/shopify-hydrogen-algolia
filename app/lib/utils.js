@@ -247,7 +247,7 @@ export function getLocaleFromRequest(request) {
 }
 
 export function getAlgoliaIndexName(type, pathPrefix) {
-  const suffix = algoConfig.marketsIndexSuffixes[pathPrefix];
+  const suffix = algoConfig.marketsIndexSuffixes?.[pathPrefix];
   return algoConfig.prefix + type + (suffix ? '_' + suffix : '');
 }
 
